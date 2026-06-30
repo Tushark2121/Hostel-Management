@@ -1,4 +1,4 @@
-# 🏠 ResidenceX — Hostel Management System
+# 🏠 ResidenceX — Hostel Management
 
 ResidenceX is a full-stack hostel management platform that gives administrators a single dashboard to manage students, rooms, fees, complaints, visitors, notices, and mess menus — while giving students a self-service portal to track their own room, fees, and requests. It is built with **Angular 18** on the frontend and **Node.js, Express, and MongoDB (Mongoose)** on the backend, secured with JWT-based authentication and role-based access control.
 
