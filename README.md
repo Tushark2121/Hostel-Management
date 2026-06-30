@@ -1,4 +1,4 @@
-# 🏠 ResidenceX — Hostel Management
+# 🏠 ResidenceX — Hostel Management System
 
 ResidenceX is a full-stack hostel management platform that gives administrators a single dashboard to manage students, rooms, fees, complaints, visitors, notices, and mess menus — while giving students a self-service portal to track their own room, fees, and requests. It is built with **Angular 18** on the frontend and **Node.js, Express, and MongoDB (Mongoose)** on the backend, secured with JWT-based authentication and role-based access control.
 
@@ -33,7 +33,7 @@ residencex/
 - **Dashboard** — live stats: total students, occupied rooms, open/urgent complaints, pending fees, defaulter count, visitors currently inside, and per-block occupancy percentages.
 - **Student Management** — search/filter students by name, ID, block, or fee status; create student records with auto-generated student IDs and linked login accounts; update or remove students.
 - **Room Management** — manage rooms across 3 blocks with type (Single/Double/Triple), capacity, amenities, and rent; allot or vacate students with automatic occupancy-status syncing.
-- **Fee Management** — create fee records per student/month, record full or partial payments, auto-track payment status (paid/partial/unpaid/overdue), and view collection summaries with defaulter counts.
+- **Fee Management** — create fee records per student/month, record full or partial payments, auto-track payment status (paid/partial/unpaid/overdue), and view collection summaries with defaulters.
 - **Complaints Management** — view all complaints with category/priority/status filters, update status (open → in-progress → resolved) with automatic resolution timestamps.
 - **Visitor Log** — log visitor entries against a student, check visitors out, and view visit history.
 - **Notices** — publish, edit, and delete general/urgent/info announcements.
