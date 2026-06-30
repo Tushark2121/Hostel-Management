@@ -1,6 +1,6 @@
 # 🏠 ResidenceX — Hostel Management System
 
-A full-stack hostel management platform built with **Angular 18** (frontend) and **Node.js + Express + MongoDB** (backend).
+ResidenceX is a full-stack hostel management platform that gives administrators a single dashboard to manage students, rooms, fees, complaints, visitors, notices, and mess menus — while giving students a self-service portal to track their own room, fees, and requests. It is built with **Angular 18** on the frontend and **Node.js, Express, and MongoDB (Mongoose)** on the backend, secured with JWT-based authentication and role-based access control.
 
 ---
 
@@ -8,180 +8,253 @@ A full-stack hostel management platform built with **Angular 18** (frontend) and
 
 ```
 residencex/
-├── backend/          Node.js + Express + MongoDB API
-└── frontend/         Angular 18 standalone components
+├── backend/                 Node.js + Express + MongoDB REST API
+│   ├── models/               Mongoose schemas (User, Student, Room, Fee, Complaint, Notice, Visitor, Mess)
+│   ├── routes/                Express route handlers, one file per resource
+│   ├── middleware/         auth.js (JWT verification) and role.js (RBAC)
+│   ├── seed.js                  Seeds the database with demo data
+│   └── server.js               App entry point
+│
+└── frontend/                 Angular 18 standalone-component app
+    └── src/app/
+        ├── core/                  Services, guards, and the JWT HTTP interceptor
+        ├── features/
+        │   ├── auth/                Login
+        │   ├── admin/             Admin dashboard, students, rooms, fees, complaints, visitors, notices, mess, reports
+        │   └── student/            Student dashboard: room, fees, complaints, visitors, notices, mess, profile
+        └── shared/                Reusable UI: sidebar, stat-card, toast
 ```
+
+---
+
+## ✨ Features
+
+### Admin Portal
+- **Dashboard** — live stats: total students, occupied rooms, open/urgent complaints, pending fees, defaulter count, visitors currently inside, and per-block occupancy percentages.
+- **Student Management** — search/filter students by name, ID, block, or fee status; create student records with auto-generated student IDs and linked login accounts; update or remove students.
+- **Room Management** — manage rooms across 3 blocks with type (Single/Double/Triple), capacity, amenities, and rent; allot or vacate students with automatic occupancy-status syncing.
+- **Fee Management** — create fee records per student/month, record full or partial payments, auto-track payment status (paid/partial/unpaid/overdue), and view collection summaries with defaulter counts.
+- **Complaints Management** — view all complaints with category/priority/status filters, update status (open → in-progress → resolved) with automatic resolution timestamps.
+- **Visitor Log** — log visitor entries against a student, check visitors out, and view visit history.
+- **Notices** — publish, edit, and delete general/urgent/info announcements.
+- **Mess Menu** — manage a weekly breakfast/lunch/dinner menu.
+- **Reports** — consolidated reporting view built on top of the dashboard/fee/student data.
+
+### Student Portal
+- View personal **room** allotment and roommate details.
+- Track **fee** payment history and outstanding dues.
+- Submit and track **complaints**.
+- View **visitor** logs related to their own visits.
+- Read hostel **notices** and the weekly **mess menu**.
+- Manage personal **profile**.
+
+### Platform-wide
+- JWT authentication with role-based route guards (`admin` vs `student`) on both the API and the Angular router.
+- Auto-generated, human-readable IDs (e.g. `STU2024001`, `C001`).
+- Password hashing with bcrypt.
+- Centralized error handling and request logging (morgan) on the backend.
+- Toast notifications and a shared sidebar layout on the frontend.
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Angular 18 (standalone components), TypeScript, RxJS, SCSS |
+| Backend | Node.js, Express 4 |
+| Database | MongoDB with Mongoose ODM |
+| Auth | JSON Web Tokens (jsonwebtoken), bcryptjs for password hashing |
+| Validation | express-validator |
+| Dev Tools | nodemon, Angular CLI, morgan (HTTP logging) |
 
 ---
 
 ## ⚡ Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- MongoDB running locally (`mongodb://localhost:27017`)
-
----
+- Node.js 18+ and npm
+- MongoDB running locally (default: `mongodb://localhost:27017`) or a MongoDB Atlas connection string
 
 ### 1️⃣ Backend Setup
 
 ```bash
 cd backend
 npm install
-
-# (optional) edit .env to change MongoDB URI or JWT secret
-# Default: mongodb://localhost:27017/residencex
-
-# Seed the database with demo data
-npm run seed
-
-# Start the API server (port 3000)
-npm run dev
 ```
 
-The API will be available at `http://localhost:3000`
+Configure environment variables in `backend/.env` (a default file is already included):
 
----
+```
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/residencex
+JWT_SECRET=residencex_super_secret_jwt_key_change_in_production
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+```
+
+> ⚠️ Change `JWT_SECRET` before deploying to production.
+
+Seed the database with demo data (admin user, student, rooms, fees, complaints, notices, visitors, mess menu):
+
+```bash
+npm run seed
+```
+
+Start the API server:
+
+```bash
+npm run dev      # with auto-reload via nodemon
+# or
+npm start        # plain node
+```
+
+The API will be available at `http://localhost:3000`. Health check: `GET http://localhost:3000/api/health`.
 
 ### 2️⃣ Frontend Setup
 
 ```bash
 cd frontend
 npm install
-
-# Start Angular dev server (port 4200)
-npm start
+npm start         # ng serve
 ```
 
-Open `http://localhost:4200` in your browser.
+The Angular app will be available at `http://localhost:4200` and is pre-configured (via `proxy.conf.json`) to proxy API calls to the backend on port 3000.
 
----
+### 3️⃣ Demo Credentials (after seeding)
 
-## 🔐 Demo Credentials
-
-| Role    | Username  | Password     |
-|---------|-----------|--------------|
-| Admin   | `admin`   | `admin123`   |
+| Role | Username | Password |
+|---|---|---|
+| Admin | `admin` | `admin123` |
 | Student | `student` | `student123` |
-
----
-
-## 🧩 Features
-
-### Admin Panel
-| Module        | Features |
-|---------------|----------|
-| Dashboard     | Live stats, block occupancy charts, recent activity |
-| Students      | Full CRUD, search/filter by block & fee status, auto-generate student IDs |
-| Rooms         | Visual room grid, allot/vacate students, status tracking |
-| Fees          | Monthly fee tracking, collect payments, send reminders |
-| Complaints    | View all complaints, update status (open → in-progress → resolved) |
-| Notice Board  | Post urgent/info/general notices, delete notices |
-| Visitor Log   | Log visitors in/out, check-out tracking |
-| Mess Menu     | View & edit weekly 7-day mess menu |
-| Reports       | Block occupancy, fee collection, complaint resolution analytics |
-
-### Student Panel
-| Module      | Features |
-|-------------|----------|
-| My Profile  | Personal details, guardian info, fee & hostel stats |
-| My Room     | Room details, roommates list, amenities |
-| Fee Status  | Full payment history with status indicators |
-| Complaints  | Raise complaints with category/priority, track status |
-| Notice Board| View all hostel announcements |
-| Mess Menu   | Weekly menu with today's highlight |
-| My Visitors | View logged visitor history |
-
----
-
-## 🛠 Tech Stack
-
-| Layer      | Technology |
-|------------|------------|
-| Frontend   | Angular 18, standalone components, RxJS, Angular Router |
-| Styling    | SCSS with CSS custom properties (design tokens) |
-| HTTP       | Angular HttpClient + JWT interceptor |
-| Backend    | Node.js, Express 4 |
-| Database   | MongoDB 7+ with Mongoose 8 |
-| Auth       | JWT (jsonwebtoken) + bcryptjs |
-| Dev Tools  | nodemon, Angular CLI 18 |
-
----
-
-## 🗄 MongoDB Collections
-
-| Collection  | Description |
-|-------------|-------------|
-| `users`     | Auth accounts (admin + student logins) |
-| `students`  | Student profiles and hostel info |
-| `rooms`     | Room definitions, occupancy |
-| `fees`      | Monthly fee records per student |
-| `complaints`| Student-raised issues |
-| `notices`   | Admin announcements |
-| `visitors`  | Visitor log entries |
-| `messes`    | Weekly mess menu |
 
 ---
 
 ## 🔌 API Endpoints
 
-```
-POST   /api/auth/login             Login
-GET    /api/auth/me                Current user
+All endpoints are prefixed with `/api`. Endpoints marked **🔒** require a valid JWT (`Authorization: Bearer <token>`); endpoints marked **🛡 admin** additionally require the `admin` role.
 
-GET    /api/dashboard/stats        Admin dashboard stats
+### Auth
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/auth/login` | Log in with username + password, returns JWT and user profile |
+| GET 🔒 | `/auth/me` | Get the currently authenticated user's profile |
 
-GET    /api/students               List students (admin)
-POST   /api/students               Create student (admin)
-GET    /api/students/:id           Get student
-PUT    /api/students/:id           Update student
-DELETE /api/students/:id           Delete student (admin)
+### Students
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒🛡 | `/students` | List students (filter by `search`, `block`, `feeStatus`) |
+| GET 🔒 | `/students/:id` | Get a single student |
+| POST 🔒🛡 | `/students` | Create a student (auto-generates `studentId`; optionally creates a linked login) |
+| PUT 🔒 | `/students/:id` | Update a student |
+| DELETE 🔒🛡 | `/students/:id` | Delete a student (and remove from their room) |
 
-GET    /api/rooms                  List rooms
-POST   /api/rooms/:id/allot        Allot room to student (admin)
-POST   /api/rooms/:id/vacate       Remove student from room (admin)
+### Rooms
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒 | `/rooms` | List rooms (filter by `block`, `status`) |
+| GET 🔒 | `/rooms/:id` | Get a single room with occupant details |
+| POST 🔒🛡 | `/rooms` | Create a room |
+| PUT 🔒🛡 | `/rooms/:id` | Update a room |
+| POST 🔒🛡 | `/rooms/:id/allot` | Allot a student to the room (handles capacity check and previous-room cleanup) |
+| POST 🔒🛡 | `/rooms/:id/vacate` | Remove a student from the room |
+| DELETE 🔒🛡 | `/rooms/:id` | Delete a room |
 
-GET    /api/fees                   List fees (admin)
-GET    /api/fees/student/:id       Student's fee history
-GET    /api/fees/summary/stats     Fee summary stats
-POST   /api/fees/:id/pay           Collect payment (admin)
+### Fees
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒🛡 | `/fees` | List fee records (filter by `status`, `month`) |
+| GET 🔒 | `/fees/student/:studentId` | List fee records for a specific student |
+| POST 🔒🛡 | `/fees` | Create a fee record |
+| PUT 🔒🛡 | `/fees/:id` | Update a fee record |
+| POST 🔒🛡 | `/fees/:id/pay` | Record a payment (auto-updates status to `partial`/`paid`) |
+| GET 🔒🛡 | `/fees/summary/stats` | Get total collected, total pending, and defaulter count |
 
-GET    /api/complaints             List complaints
-POST   /api/complaints             Create complaint
-PUT    /api/complaints/:id         Update status (admin)
+### Complaints
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒 | `/complaints` | List complaints (admins see all; students see only their own; filter by `status`, `category`) |
+| GET 🔒 | `/complaints/:id` | Get a single complaint |
+| POST 🔒 | `/complaints` | Submit a complaint |
+| PUT 🔒🛡 | `/complaints/:id` | Update status/details (auto-stamps `resolvedAt`/`resolvedBy` on resolution) |
+| DELETE 🔒🛡 | `/complaints/:id` | Delete a complaint |
 
-GET    /api/notices                List notices
-POST   /api/notices                Post notice (admin)
-DELETE /api/notices/:id            Delete notice (admin)
+### Visitors
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒 | `/visitors` | List visitor logs (students see only their own) |
+| POST 🔒🛡 | `/visitors` | Log a new visitor entry |
+| PUT 🔒🛡 | `/visitors/:id/checkout` | Mark a visitor as checked out |
+| DELETE 🔒🛡 | `/visitors/:id` | Delete a visitor log entry |
 
-GET    /api/visitors               List visitors
-POST   /api/visitors               Log visitor (admin)
-PUT    /api/visitors/:id/checkout  Check out visitor (admin)
+### Notices
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒 | `/notices` | List all notices |
+| POST 🔒🛡 | `/notices` | Create a notice |
+| PUT 🔒🛡 | `/notices/:id` | Update a notice |
+| DELETE 🔒🛡 | `/notices/:id` | Delete a notice |
 
-GET    /api/mess                   Weekly menu
-PUT    /api/mess/:id               Update menu item (admin)
-```
+### Mess
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒 | `/mess` | Get the weekly mess menu (sorted Monday–Sunday) |
+| PUT 🔒🛡 | `/mess/:id` | Update a day's menu |
+
+### Dashboard
+| Method | Endpoint | Description |
+|---|---|---|
+| GET 🔒🛡 | `/dashboard/stats` | Aggregate stats: student count, room occupancy, complaints, pending fees, defaulters, visitors inside, per-block occupancy |
+
+### Misc
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | API health check |
 
 ---
 
-## 🔧 Environment Variables (backend/.env)
+## 🗄 Data Model Overview
 
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/residencex
-JWT_SECRET=your_secret_here
-JWT_EXPIRES_IN=7d
-NODE_ENV=development
-```
+| Model | Key Fields |
+|---|---|
+| **User** | username, email, password (hashed), role (`admin`/`student`), studentRef |
+| **Student** | studentId, name, email, phone, course, year, rollNumber, block, room, guardian, status, feeStatus |
+| **Room** | number, block, floor, type, capacity, occupants[], status, amenities[], monthlyRent |
+| **Fee** | student, amount, month, dueDate, paidDate, status, paidAmount, remarks |
+| **Complaint** | complaintId, student, title, category, priority, status, description, resolvedAt/By |
+| **Notice** | title, body, type, postedBy |
+| **Visitor** | name, relation, phone, student, inTime, outTime, status, loggedBy |
+| **Mess** | day, breakfast, lunch, dinner, weekLabel |
 
 ---
 
-## 📦 Production Build
+## 🔐 Authentication & Authorization Flow
+
+1. User logs in via `POST /api/auth/login` with username/password.
+2. Backend verifies the password hash and issues a JWT containing `id`, `username`, `role`, and (for students) `studentId`.
+3. The Angular `jwt.interceptor.ts` attaches the token to every outgoing request as a `Bearer` header.
+4. The backend's `auth.js` middleware verifies the token on protected routes; `role.js` middleware restricts admin-only routes.
+5. On the frontend, `auth.guard.ts` and `role.guard.ts` protect Angular routes so students can't navigate into admin views and vice versa.
+
+---
+
+## 📦 Building for Production
 
 ```bash
-# Backend
-cd backend && npm start
+# Frontend production build
+cd frontend
+npm run build
+# Output: frontend/dist/
 
-# Frontend
-cd frontend && npm run build
-# Output: frontend/dist/residencex/
+# Backend
+cd backend
+NODE_ENV=production npm start
 ```
+
+Serve the Angular `dist/` build with a static file server or reverse proxy (e.g. Nginx) and point it at the backend API, or serve it from Express by adding a static middleware in `server.js`.
+
+---
+
+## 📄 License
+
+This project was built for academic/portfolio purposes as part of a B.Tech IT curriculum project.
