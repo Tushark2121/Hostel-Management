@@ -1,0 +1,1 @@
+import{K as o,ca as a}from"./chunk-ATYKJJXV.js";var c=(()=>{class t{constructor(){this.toast=a(null)}show(e,s="success"){this.toast.set({message:e,type:s}),setTimeout(()=>this.toast.set(null),3e3)}static{this.\u0275fac=function(s){return new(s||t)}}static{this.\u0275prov=o({token:t,factory:t.\u0275fac,providedIn:"root"})}}return t})();export{c as a};
